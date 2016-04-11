@@ -32,6 +32,9 @@ public class BufMgr implements GlobalConst {
 	
 	protected Page[] buffer_pool;
 	protected FrameDesc[] frametab; 
+	//pageToFrame: to map a disk page number to a frame descriptor 
+	//+ to tell if the a disk page is not in the buffer pool
+	protected HashMap<Integer, Integer> pageToFrame; 
 	
   public BufMgr(int numframes) {
 
@@ -44,6 +47,7 @@ public class BufMgr implements GlobalConst {
 	      frametab[i] = new FrameDesc();
 	  }
 
+	  pageToFrame = new HashMap<>();
 	  
   } // public BufMgr(int numframes)
 
@@ -132,7 +136,12 @@ public class BufMgr implements GlobalConst {
    */
   public void flushAllFrames() {
 
-    throw new UnsupportedOperationException("Not implemented");
+	  for (int i = 0 ; i < frametab.length ; i ++)
+	  {
+		  if(frametab[i].valid && frametab[i].dirty)
+			  flushPage(frametab[i].pageno);
+	  }
+    
 
   } // public void flushAllFrames()
 
@@ -142,23 +151,49 @@ public class BufMgr implements GlobalConst {
    * @throws IllegalArgumentException if the page is not in the buffer pool
    */
   public void flushPage(PageId pageno) {
+	 
+	  //int can not hold "null"!
+	  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
+	  Integer frameNo = pageToFrame.get(pageno.pid);
 	  
-	throw new UnsupportedOperationException("Not implemented");
-    
+	if(frameNo != null && frametab[frameNo].dirty)
+	{
+		//write page to disk
+		Minibase.DiskManager.write_page(pageno, buffer_pool[frameNo]);
+	}
+	else
+	{
+		 throw new IllegalArgumentException("Page is not in the buffer pool!");
+	}
+	
   }
 
    /**
    * Gets the total number of buffer frames.
    */
   public int getNumFrames() {
-    throw new UnsupportedOperationException("Not implemented");
+    
+	  return frametab.length;
+
   }
 
   /**
    * Gets the total number of unpinned buffer frames.
    */
   public int getNumUnpinned() {
-    throw new UnsupportedOperationException("Not implemented");
+    
+	  int unpinned_count = 0;
+	  
+	    for (int i = 0; i < frametab.length; i++)
+	    {
+	       if (frametab[i].pin_count == 0)
+	       {
+	         unpinned_count++;
+	       }
+	    }
+	    
+	    return unpinned_count;
+
   }
 
 } // public class BufMgr implements GlobalConst

@@ -18,13 +18,14 @@ public class FrameDesc {
 	protected boolean valid; //valid data in frame or not
 	protected PageId pageno; //disk page number
 	protected int pin_count; // # of callers who pin data
-	// reference bit?
+	protected boolean refbit;
 	
 	public FrameDesc() {
 		dirty = false;
 		valid = false; 
-		// pageno = 
+		pageno = null; //OR new PageId();
 		pin_count = 0;
+		refbit = false;
 		
 	}
 
