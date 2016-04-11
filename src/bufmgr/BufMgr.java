@@ -95,7 +95,31 @@ public class BufMgr implements GlobalConst {
    */
   public void unpinPage(PageId pageno, boolean dirty) {
 
-    throw new UnsupportedOperationException("Not implemented");
+	  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
+	  Integer frameNo = pageToFrame.get(pageno.pid);
+	  
+	  //first check if the page is not in the buffer pool OR not pinned
+	  if(frameNo == null || frametab[frameNo].pin_count == 0)
+		{
+		  throw new IllegalArgumentException("Page is not in the buffer pool or not pinned!");
+		}
+		else
+		{
+			//is page updated or not
+			if(dirty)
+				frametab[frameNo].dirty = UNPIN_DIRTY; //UNPIN_DIRTY = true ==> write update to disk
+			else
+				frametab[frameNo].dirty = UNPIN_CLEAN; //UNPIN_CLEAN = false ==> no update (no need to write back to disk)
+			
+			//decrease pin_count variable for that frame
+			frametab[frameNo].pin_count--;
+			
+			//set "refbit" to true when pin_count is set to 0
+			if (frametab[frameNo].pin_count == 0)
+		      {
+		        frametab[frameNo].refbit = true;
+		      }
+		}
 
   } // public void unpinPage(PageId pageno, boolean dirty)
   
