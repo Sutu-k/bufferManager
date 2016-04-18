@@ -48,7 +48,7 @@ public class BufMgr implements GlobalConst {
 	      frametab[i] = new FrameDesc();
 	  }
 
-	  pageFrameMap = new HashMap<>();
+	  pageFrameMap = new HashMap<Integer, Integer>();
 	  replPolicy = new Clock(this);
 	  
   } // public BufMgr(int numframes)
@@ -115,6 +115,7 @@ public class BufMgr implements GlobalConst {
 	          frametab[victimFrm].valid = false; 
 	          frametab[victimFrm].dirty = false;
 	          frametab[victimFrm].refbit = false;
+
 			  
 			  switch (contents)
 			  {
@@ -130,7 +131,7 @@ public class BufMgr implements GlobalConst {
 		          frametab[victimFrm].dirty = false;
 		          
 		          //frametab[victimFrm].pageno.copyPageId(pageno);
-		          frametab[victimFrm].pageno = pageno;
+		          frametab[victimFrm].pageno = new PageId(pageno.pid);
 		          
 		          frametab[victimFrm].refbit = true;
 		          
@@ -148,14 +149,15 @@ public class BufMgr implements GlobalConst {
 				  frametab[victimFrm].pin_count ++;
 		          frametab[victimFrm].valid = true; 
 		          frametab[victimFrm].dirty = false;
-		          
+
+				  frametab[victimFrm].pageno = new PageId();
 		          //frametab[victimFrm].pageno.copyPageId(pageno);
-		          frametab[victimFrm].pageno = pageno;
+		          frametab[victimFrm].pageno = new PageId(pageno.pid);
 		          
 		          frametab[victimFrm].refbit = true;
 	              
 
-		          pageFrameMap.put(frametab[victimFrm].pageno.pid, victimFrm);
+		          pageFrameMap.put(this.frametab[victimFrm].pageno.pid, victimFrm);
 		          
 		          buffer_pool[victimFrm].setPage(mempage);
 		           
@@ -300,14 +302,15 @@ public class BufMgr implements GlobalConst {
    */
   public void flushAllFrames() {
 
-	  for (int i=0 ; i < frametab.length ; i++)
-	  {
-		  if(frametab[i].valid && frametab[i].dirty)
-			  
-			  System.out.println(frametab[i].pageno.pid);
-		  	  System.out.println(pageFrameMap.toString());
-			  
-		  	  flushPage(frametab[i].pageno);
+	  for (int i=0 ; i < frametab.length ; ++i) {
+		  if (frametab[i].pageno != null) {
+			  if (frametab[i].valid && frametab[i].dirty) {
+				  System.out.println(frametab[i].pageno.pid);
+				  System.out.println(pageFrameMap.toString());
+
+				  flushPage(frametab[i].pageno);
+			  }
+		  }
 	  }
 
   } // public void flushAllFrames()
