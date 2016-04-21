@@ -7,14 +7,13 @@ import global.GlobalConst;
 
 	private int current;
 	//frametab: copy of the frametab in "BufMgr.java"
-	protected FrameDesc[] frametab;
+	private FrameDesc[] frametab;
 	 
 	public Clock(BufMgr bm) {
-		
 		current = 0;
 		this.frametab=bm.frametab;
-	
 	}
+	
 	
 	
 	public int pickVictim() {
@@ -40,7 +39,6 @@ import global.GlobalConst;
 		}
 		
 		// (-1) if No frame available in the buff. pool
-		// TODO: return an error
 		return -1;
 	}
 }

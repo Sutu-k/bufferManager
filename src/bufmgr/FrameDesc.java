@@ -27,6 +27,7 @@ public class FrameDesc {
 		pin_count = 0;
 		refbit = false;
 		
+		
 	}
 
 }
