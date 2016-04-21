@@ -1,3 +1,4 @@
+
 package bufmgr;
 
 import global.GlobalConst;
@@ -91,6 +92,9 @@ public class BufMgr implements GlobalConst {
 	// If disk page pageno is already in the buffer pool ==> increment pin_count of that frame.  
 	  if(frameNo != null){
 		  frametab[frameNo].pin_count ++;
+		//set page and data
+          mempage.setPage(buffer_pool[pageFrameMap.get(pageno.pid)]);
+          mempage.setData(buffer_pool[pageFrameMap.get(pageno.pid)].getData());
 	  }
 	  else {
 		  //uses the "Clock" replacement policy to select a frame to replace
@@ -157,9 +161,11 @@ public class BufMgr implements GlobalConst {
 		          frametab[victimFrm].refbit = true;
 	              
 
+		          buffer_pool[victimFrm].setPage(mempage);
+		          
 		          pageFrameMap.put(pageno.pid, victimFrm);
 		          
-		          buffer_pool[victimFrm].setPage(mempage);
+		          
 				  
 				  break;
 			  }
@@ -267,6 +273,7 @@ public class BufMgr implements GlobalConst {
 	  }
 	  //3. otherwise; "pinPage" 
 	  else {
+		  pageno.pid = Minibase.DiskManager.allocate_page(run_size).pid;
 		  pinPage(pageno, firstpg, PIN_MEMCPY);
 	  }
 	  
@@ -343,7 +350,6 @@ public class BufMgr implements GlobalConst {
 			{
 				if (frametab[frameNo].dirty) {
 					//write page to disk
-					System.out.println("psgeno: "+ pageno.pid + " frame: " + frameNo);
 					Minibase.DiskManager.write_page(pageno, buffer_pool[frameNo]);
 				}
 			}

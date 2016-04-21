@@ -76,12 +76,13 @@ class BMTest extends TestDriver {
     System.out.print("  - Write something on each one\n");
     PageId pid = new PageId();
     PageId lastPid = new PageId();
-
+    //System.out.println("pid: " + pid.pid + " lastPid: "+ lastPid.pid);
     for (pid.pid = firstPid.pid, lastPid.pid = pid.pid + toAlloc; status1 == PASS
         && pid.pid < lastPid.pid; pid.pid = pid.pid + 1) {
-
+    	
       try {
         Minibase.BufferManager.pinPage(pid, pg, PIN_NOOP);
+        //System.out.println(pid.pid);
       } catch (Exception e) {
         System.err.print("*** Could not pin new page " + pid.pid + "\n");
         e.printStackTrace();
@@ -92,7 +93,7 @@ class BMTest extends TestDriver {
       // unlikely that this bit pattern would show up there by
       // coincidence.
       int data = pid.pid + 99999;
-      //System.out.println("write: pid: "+ pid.pid + " data= " + data + ", ");
+      //System.out.println("write: pid: "+ pid.pid + " data= " + data);
       Convert.setIntValue(data, 0, pg.getData());
 
       try {
@@ -112,7 +113,7 @@ class BMTest extends TestDriver {
     		pid.pid = pid.pid + 1) {
 
       try {
-    	  //System.out.println(pid.pid + " " + status1 + " " + lastPid.pid);
+    	  System.out.println("Read That sth: " + pid.pid + " " + status1 + " ");
         Minibase.BufferManager.pinPage(pid, pg, PIN_DISKIO);
       } catch (Exception e) {
         System.err.print("*** Could not pin page " + pid.pid + "\n");
@@ -123,7 +124,7 @@ class BMTest extends TestDriver {
       int data = 0;
       data = Convert.getIntValue(0, pg.getData());
       //System.out.println(status1+" ,read: pid: "+ pid.pid + " data= " + data + ", ");
-      if (status1 == PASS) {
+      if (status1 == PASS) { System.out.println(data + " " + pid.pid + " " + ((pid.pid) + 99999));
         if (data != (pid.pid) + 99999) {
           status1 = FAIL;  //record failure but continue the test
           System.err.print("*** Read wrong data back from page " + pid.pid + "\n");

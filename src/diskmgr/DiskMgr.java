@@ -174,7 +174,7 @@ public class DiskMgr implements GlobalConst {
 
     // validate the page id
     if ((pageno.pid < 0) || (pageno.pid >= num_db_pages)) {
-      throw new IllegalArgumentException("Invalid page number; write aborted");
+      throw new IllegalArgumentException("Invalid page number; write aborted" + pageno.pid);
     }
 
     // seek to the correct page on disk and write it
