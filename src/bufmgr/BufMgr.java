@@ -308,8 +308,6 @@ public class BufMgr implements GlobalConst {
 	  for (int i=0 ; i < frametab.length ; ++i) {
 		  if (frametab[i].pageno != null) {
 			  if (frametab[i].valid && frametab[i].dirty) {
-				  //System.out.println(frametab[i].pageno.pid);
-				  //System.out.println(pageFrameMap.toString());
 
 				  flushPage(frametab[i].pageno);
 			  }
