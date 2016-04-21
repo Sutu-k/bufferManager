@@ -150,7 +150,7 @@ public class BufMgr implements GlobalConst {
 		          frametab[victimFrm].valid = true; 
 		          frametab[victimFrm].dirty = false;
 
-				  frametab[victimFrm].pageno = new PageId();
+				  //frametab[victimFrm].pageno = new PageId();
 		          //frametab[victimFrm].pageno.copyPageId(pageno);
 		          frametab[victimFrm].pageno = new PageId(pageno.pid);
 		          
@@ -166,8 +166,24 @@ public class BufMgr implements GlobalConst {
 			  case PIN_NOOP: {
 				//copy nothing into the frame - the frame contents are irrelevant
 				  
-				//NOT CLEAR
+				  frametab[victimFrm].pin_count ++;
+		          frametab[victimFrm].valid = true; 
+		          frametab[victimFrm].dirty = false;
+
+				
+		          frametab[victimFrm].pageno = new PageId(pageno.pid);
+		          
+		          frametab[victimFrm].refbit = true;
 	              
+
+		          pageFrameMap.put(this.frametab[victimFrm].pageno.pid, victimFrm);
+		          
+		          buffer_pool[victimFrm].setPage(mempage);
+		          
+		          //set page and data
+	              mempage.setPage(buffer_pool[victimFrm]);
+	              mempage.setData(buffer_pool[victimFrm].getData());
+		              
 				  break;
 			  }
 			  }
@@ -279,21 +295,23 @@ public class BufMgr implements GlobalConst {
    */
   public void freePage(PageId pageno) {
 
-	//frameNo: is used to check if firstpg is already pinned
-	Integer frameNo = pageFrameMap.get(pageno.pid);
-	
-	//System.out.println("In freePage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
-	  
-	//1. check if pageno in the buffer pool already
-	// and if it is pinned or not
-	if(frameNo != null && frametab[frameNo].pin_count > 0) {
-		throw new IllegalArgumentException("The page is pinned!");
-	}
-	//2. otherwise; deallocate the page / free it from the pool
-	else {
-		Minibase.DiskManager.deallocate_page(pageno);
-	}
-    
+	  if(pageFrameMap.containsKey(pageno.pid)){
+		  
+		//frameNo: is used to check if firstpg is already pinned
+		Integer frameNo = pageFrameMap.get(pageno.pid);
+		
+		//System.out.println("In freePage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
+		  
+		//1. check if pageno in the buffer pool already
+		// and if it is pinned or not
+		if(frameNo != null && frametab[frameNo].pin_count > 0) {
+			throw new IllegalArgumentException("The page is pinned!");
+		}
+		//2. otherwise; deallocate the page / free it from the pool
+		else {
+			Minibase.DiskManager.deallocate_page(pageno);
+		}
+	  }
 
   } // public void freePage(PageId firstid)
 

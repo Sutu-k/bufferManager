@@ -92,6 +92,7 @@ class BMTest extends TestDriver {
       // unlikely that this bit pattern would show up there by
       // coincidence.
       int data = pid.pid + 99999;
+      //System.out.println("write: pid: "+ pid.pid + " data= " + data + ", ");
       Convert.setIntValue(data, 0, pg.getData());
 
       try {
@@ -111,6 +112,7 @@ class BMTest extends TestDriver {
     		pid.pid = pid.pid + 1) {
 
       try {
+    	  System.out.println(pid.pid + " " + status1 + " " + lastPid.pid);
         Minibase.BufferManager.pinPage(pid, pg, PIN_DISKIO);
       } catch (Exception e) {
         System.err.print("*** Could not pin page " + pid.pid + "\n");
@@ -120,12 +122,13 @@ class BMTest extends TestDriver {
 
       int data = 0;
       data = Convert.getIntValue(0, pg.getData());
-
+      System.out.println(status1+" ,read: pid: "+ pid.pid + " data= " + data + ", ");
       if (status1 == PASS) {
         if (data != (pid.pid) + 99999) {
           status1 = FAIL;  //record failure but continue the test
           System.err.print("*** Read wrong data back from page " + pid.pid + "\n");
         }
+        System.out.print(status1);
       }
 
       try {
@@ -137,6 +140,8 @@ class BMTest extends TestDriver {
       }
     }
 
+    
+    
     //Free the allocated pages
     if (status1 == PASS) {
       System.out.print("  - Free the allocated pages\n");
