@@ -112,7 +112,7 @@ class BMTest extends TestDriver {
     		pid.pid = pid.pid + 1) {
 
       try {
-    	  System.out.println(pid.pid + " " + status1 + " " + lastPid.pid);
+    	  //System.out.println(pid.pid + " " + status1 + " " + lastPid.pid);
         Minibase.BufferManager.pinPage(pid, pg, PIN_DISKIO);
       } catch (Exception e) {
         System.err.print("*** Could not pin page " + pid.pid + "\n");
@@ -122,7 +122,7 @@ class BMTest extends TestDriver {
 
       int data = 0;
       data = Convert.getIntValue(0, pg.getData());
-      System.out.println(status1+" ,read: pid: "+ pid.pid + " data= " + data + ", ");
+      //System.out.println(status1+" ,read: pid: "+ pid.pid + " data= " + data + ", ");
       if (status1 == PASS) {
         if (data != (pid.pid) + 99999) {
           status1 = FAIL;  //record failure but continue the test

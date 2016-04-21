@@ -136,7 +136,7 @@ public class BufMgr implements GlobalConst {
 		          frametab[victimFrm].refbit = true;
 		          
 		          
-		          pageFrameMap.put(frametab[victimFrm].pageno.pid, victimFrm);
+		          pageFrameMap.put(pageno.pid, victimFrm);
 		          
 		          mempage.setData(buffer_pool[victimFrm].getData());
 				
@@ -157,10 +157,10 @@ public class BufMgr implements GlobalConst {
 		          frametab[victimFrm].refbit = true;
 	              
 
-		          pageFrameMap.put(this.frametab[victimFrm].pageno.pid, victimFrm);
+		          pageFrameMap.put(pageno.pid, victimFrm);
 		          
 		          buffer_pool[victimFrm].setPage(mempage);
-		           
+				  
 				  break;
 			  }
 			  case PIN_NOOP: {
@@ -176,22 +176,19 @@ public class BufMgr implements GlobalConst {
 		          frametab[victimFrm].refbit = true;
 	              
 
-		          pageFrameMap.put(this.frametab[victimFrm].pageno.pid, victimFrm);
+		          pageFrameMap.put(pageno.pid, victimFrm);
 		          
 		          buffer_pool[victimFrm].setPage(mempage);
 		          
 		          //set page and data
 	              mempage.setPage(buffer_pool[victimFrm]);
 	              mempage.setData(buffer_pool[victimFrm].getData());
-		              
+				  }
+				  
 				  break;
 			  }
-			  }
 		  }
-		  
 	  }
-	  
-
   } // public void pinPage(PageId pageno, Page page, int contents)
   
   /**
@@ -204,8 +201,8 @@ public class BufMgr implements GlobalConst {
    */
   public void unpinPage(PageId pageno, boolean dirty) {
 
-	  if(pageFrameMap.containsKey(pageno.pid)){
-		  
+	  //if(pageFrameMap.containsKey(pageno.pid)){
+	  
 	  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
 	  Integer frameNo = pageFrameMap.get(pageno.pid);
 	  
@@ -236,8 +233,6 @@ public class BufMgr implements GlobalConst {
 		        frametab[frameNo].refbit = true;
 		      }
 		}
-
-	  }
   } // public void unpinPage(PageId pageno, boolean dirty)
   
   /**
@@ -260,13 +255,6 @@ public class BufMgr implements GlobalConst {
 	  
 	  
 	  //System.out.println("In newPage: "+ "frameNo is: #" + frameNo + "run_size is: " + run_size);
-	  
-  
-//	  Allocates a run of new disk pages and pins the first one in the buffer pool.
-//	  The pin will be made using PIN_MEMCPY.  Watch out for disk page leaks.
-	  
-//	   * @throws IllegalArgumentException if firstpg is already pinned
-//	   * @throws IllegalStateException if all pages are pinned (i.e. pool exceeded)
 
 	  //1. check if there is a free frame in buffer pool
 	  if(getNumUnpinned() == 0) {
@@ -295,8 +283,7 @@ public class BufMgr implements GlobalConst {
    */
   public void freePage(PageId pageno) {
 
-	  if(pageFrameMap.containsKey(pageno.pid)){
-		  
+	  
 		//frameNo: is used to check if firstpg is already pinned
 		Integer frameNo = pageFrameMap.get(pageno.pid);
 		
@@ -311,7 +298,7 @@ public class BufMgr implements GlobalConst {
 		else {
 			Minibase.DiskManager.deallocate_page(pageno);
 		}
-	  }
+	  
 
   } // public void freePage(PageId firstid)
 
@@ -323,11 +310,12 @@ public class BufMgr implements GlobalConst {
    */
   public void flushAllFrames() {
 
-	  for (int i=0 ; i < frametab.length ; ++i) {
+	  for (int i=0 ; i < frametab.length ; i++) {
 		  if (frametab[i].pageno != null) {
 			  if (frametab[i].valid && frametab[i].dirty) {
 
-				  flushPage(frametab[i].pageno);
+					  flushPage(frametab[i].pageno); 
+
 			  }
 		  }
 	  }
@@ -341,25 +329,29 @@ public class BufMgr implements GlobalConst {
    */
   public void flushPage(PageId pageno) {
 	 
-	  //int can not hold "null"!
-	  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
-	  Integer frameNo = pageFrameMap.get(pageno.pid);
-	  
-	 // System.out.println("In flushPage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
-	  
-	  
-		if(frameNo != null)
-		{
-			if (frametab[frameNo].dirty) {
-				//write page to disk
-				Minibase.DiskManager.write_page(pageno, buffer_pool[frameNo]);
-			}
-		}
-		else
-		{
-			 throw new IllegalArgumentException("Page is not in the buffer pool!");
-		}
+	  if(pageFrameMap.containsKey(pageno.pid)){
+		  
 	
+		  //int can not hold "null"!
+		  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
+		  Integer frameNo = pageFrameMap.get(pageno.pid);
+		  
+		 // System.out.println("In flushPage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
+		  
+		  
+			if(frameNo != null)
+			{
+				if (frametab[frameNo].dirty) {
+					//write page to disk
+					System.out.println("psgeno: "+ pageno.pid + " frame: " + frameNo);
+					Minibase.DiskManager.write_page(pageno, buffer_pool[frameNo]);
+				}
+			}
+			else
+			{
+				 throw new IllegalArgumentException("Page is not in the buffer pool!");
+			}
+	  }
   }
 
    /**
