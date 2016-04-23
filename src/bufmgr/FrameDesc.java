@@ -1,10 +1,10 @@
 package bufmgr;
 
+import global.Page;
 import global.PageId;
 
-public class FrameDesc {
+public class FrameDesc extends Page {
 
-	
 	/*
 		* Each frame has certain states associated with it. These states include whether the frame
 		is dirty, whether it includes valid data (data which reflects data in a disk page), and if it
