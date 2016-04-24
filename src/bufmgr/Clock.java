@@ -1,44 +1,51 @@
 package bufmgr;
 
 import global.GlobalConst;
+import global.PageId;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
-	public class Clock implements GlobalConst {
+public class Clock implements GlobalConst {
 
-	private int current;
-	//frametab: copy of the frametab in "BufMgr.java"
-	private FrameDesc[] frametab;
+	protected HashMap<PageId, FrameDesc> pageFrameMap;
 	 
 	public Clock(BufMgr bm) {
-		current = 0;
-		this.frametab=bm.frametab;
+
+		this.pageFrameMap = bm.pageFrameMap;
 	}
 	
 	
-	
-	public int pickVictim() {
+	public FrameDesc pickVictim() {
 		
 		//(frametab.length)*2: as we need to check the buff. pool 2 times
-		for(int counter = 0; counter <= (frametab.length)*2; counter++) {
+		Iterator map = pageFrameMap.entrySet().iterator();
+		while (map.hasNext()) {
+			Map.Entry pair = (Map.Entry) map.next();
+			PageId key = (PageId) pair.getKey();
+			FrameDesc frame = (FrameDesc) pair.getValue();
 			
 			//1. if data in bufpool[current] is not valid, choose current
-			if (!frametab[current].valid){
-				return current;
+			if (!frame.valid){
+				return frame;
 			}
 			//2. if frametab[current]'s pin count is 0
-			else if (frametab[current].pin_count == 0){
+			else if (frame.pin_count == 0){
 				// check if frametab [current] has refbit
-				if (frametab[current].refbit){
-					frametab[current].refbit = false;
+				if (frame.refbit){
+					frame.refbit = false;
 				} else {
-					return current;
+					return frame;
 				}	
 			}
-			// increment current, mod N
-			current = (current+1) % frametab.length;
+			// increment current, mod
 		}
 		
 		// (-1) if No frame available in the buff. pool
-		return -1;
+		// TODO: return an error
+		return null;
 	}
 }
