@@ -174,7 +174,7 @@ public class DiskMgr implements GlobalConst {
 
     // validate the page id
     if ((pageno.pid < 0) || (pageno.pid >= num_db_pages)) {
-      throw new IllegalArgumentException("Invalid page number; write aborted" + pageno.pid);
+      throw new IllegalArgumentException("Invalid page number; write aborted");
     }
 
     // seek to the correct page on disk and write it
@@ -471,7 +471,7 @@ public class DiskMgr implements GlobalConst {
       Page pg = new Page();
       Minibase.BufferManager.pinPage(pgid, pg, PIN_DISKIO);
       byte[] pgbuf = pg.getData();
-  	
+
       // locate the piece of the run that fits on this page
       int first_byte_no = first_bit_no / 8;
       int first_bit_offset = first_bit_no % 8;
