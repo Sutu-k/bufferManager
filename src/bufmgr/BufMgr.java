@@ -36,7 +36,7 @@ public class BufMgr implements GlobalConst {
 	
 	ArrayList<FrameDesc> buffer_pool;
 	int MAX;
-	//pageToFrame: to map a disk page number to a frame descriptor 
+	//pageFrameMap: to map a disk page number to a frame descriptor 
 	//+ to tell if the a disk page is not in the buffer pool
 	HashMap<PageId, FrameDesc> pageFrameMap;
 	Clock replPolicy;
