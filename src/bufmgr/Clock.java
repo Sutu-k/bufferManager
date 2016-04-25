@@ -23,13 +23,11 @@ public class Clock implements GlobalConst {
 
         this.pageFrameArray = new ArrayList<FrameDesc>(bm.pageFrameMap.values());
 
-        //(frametab.length)*2: as we need to check the buff. pool 2 times
-        int i;
-        for (i = 0; i < (pageFrameArray.size() * 2); i++) {
-            current = i % pageFrameArray.size();
+        //((pageFrameArray.size() * 2): as we need to check the buff. pool 2 times
+        for (int i = 0; i < (pageFrameArray.size() * 2); i++) {
+            //current = i % pageFrameArray.size();
             //1. if data in bufpool[current] is not valid, choose current
             if (pageFrameArray.get(current).valid != true) {
-                ;
                 return pageFrameArray.get(current);
             }
             //2. if frametab[current]'s pin count is 0
@@ -43,6 +41,10 @@ public class Clock implements GlobalConst {
                     }
                 }
             }
+            
+            // increment current, mod N
+         	current = (current+1) % pageFrameArray.size();
+            //current = i % pageFrameArray.size();
         }
 
         // (-1) if No frame available in the buff. pool

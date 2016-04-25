@@ -130,20 +130,15 @@ public class BufMgr implements GlobalConst {
 				 
 		            
 		          Minibase.DiskManager.read_page(pageno, victimFrm);
-		          
-		          
-				  victimFrm.pin_count ++;
+		    
+		          victimFrm.pin_count ++;
 		          victimFrm.valid = true;
 		          victimFrm.dirty = false;
-
 				  victimFrm.pageno = new PageId();
 		          victimFrm.pageno.copyPageId(pageno);
-		          
 		          victimFrm.refbit = true;
 		          
-		          
 		          pageFrameMap.put(victimFrm.pageno, victimFrm);
-		          
 		          mempage.setData(victimFrm.getData());
 				
 	              
@@ -157,12 +152,10 @@ public class BufMgr implements GlobalConst {
 		          victimFrm.dirty = false;
 				  victimFrm.pageno = new PageId();
 		          victimFrm.pageno.copyPageId(pageno);
-		          
 		          victimFrm.refbit = true;
 	              
 
 		          pageFrameMap.put(victimFrm.pageno, victimFrm);
-		          
 		          victimFrm.setPage(mempage);
 		           
 				  break;
@@ -173,20 +166,16 @@ public class BufMgr implements GlobalConst {
                   victimFrm.pin_count++;
                   victimFrm.valid = true;
                   victimFrm.dirty = false;
-
-
                   victimFrm.pageno = new PageId(pageno.pid);
-
                   victimFrm.refbit = true;
 
                   pageFrameMap.put(pageno, victimFrm);
-
                   victimFrm.setPage(mempage);
 
                   //set page and data
-                  mempage.setPage(victimFrm);
-                  mempage.setData(victimFrm.getData());
-	              
+//                  mempage.setPage(victimFrm);
+//                  mempage.setData(victimFrm.getData());
+//	              
 				  break;
 			  }
 			  }
@@ -256,16 +245,6 @@ public class BufMgr implements GlobalConst {
       //pageno.pid = Minibase.DiskManager.allocate_page(run_size).pid;
 	  //frameNo: is used to check if firstpg is already pinned
 	  FrameDesc frameNo = pageFrameMap.get(pageno);
-
-
-	  //System.out.println("In newPage: "+ "frameNo is: #" + frameNo + "run_size is: " + run_size);
-	  
-  
-//	  Allocates a run of new disk pages and pins the first one in the buffer pool.
-//	  The pin will be made using PIN_MEMCPY.  Watch out for disk page leaks.
-	  
-//	   * @throws IllegalArgumentException if firstpg is already pinned
-//	   * @throws IllegalStateException if all pages are pinned (i.e. pool exceeded)
 
 	  //1. check if there is a free frame in buffer pool
 	  if(getNumUnpinned() == 0) {
@@ -347,12 +326,8 @@ public class BufMgr implements GlobalConst {
    */
   public void flushPage(PageId pageno, FrameDesc frameNo) {
 	 
-	  //int can not hold "null"!
 	  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
-	 // FrameDesc frameNo = pageFrameMap.get(pageno);
-	  //pageFrameMap.remove(pageno);
-	  
-	  
+
 		if(frameNo != null)
 		{
 			if (frameNo.dirty) {
