@@ -10,4 +10,4 @@ tmp/
 *.minibase
 out/
 *.iml
-
+*.minibase
