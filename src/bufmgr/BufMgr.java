@@ -50,7 +50,7 @@ public class BufMgr implements GlobalConst {
 	  }
 
 	  pageFrameMap = new HashMap<PageId, FrameDesc>();
-	  replPolicy = new Clock(this);
+	  replPolicy = new Clock();
 	  
   } // public BufMgr(int numframes)
 
@@ -100,7 +100,7 @@ public class BufMgr implements GlobalConst {
 			  victimFrm = buffer_pool.get(buffer_pool.size()-1);
 			  buffer_pool.remove(victimFrm);
 		  } else {
-			  victimFrm = replPolicy.pickVictim();
+			  victimFrm = replPolicy.pickVictim(this);
 
 			  //if we couldn't find an available frame, so return an error
 			  if (victimFrm == null) {

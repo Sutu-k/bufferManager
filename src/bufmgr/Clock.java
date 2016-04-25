@@ -3,56 +3,51 @@ package bufmgr;
 import global.GlobalConst;
 import global.PageId;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 
 public class Clock implements GlobalConst {
 
-	protected HashMap<PageId, FrameDesc> pageFrameMap;
-	protected FrameDesc current;
+	protected List<FrameDesc> pageFrameArray;
+	protected int current;
 	 
-	public Clock(BufMgr bm) {
+	public Clock() {
 
-		this.pageFrameMap = bm.pageFrameMap;
-		this.current = null;
+		this.pageFrameArray = null;
+		this.current = 0;
 	}
-	
-	
-	public FrameDesc pickVictim() {
 
-		int count = 0;
-		//(frametab.length)*2: as we need to check the buff. pool 2 times
-		while (count < 2) {
-			Iterator map = pageFrameMap.entrySet().iterator();
-			while (map.hasNext()) {
-				Map.Entry pair = (Map.Entry) map.next();
-				PageId key = (PageId) pair.getKey();
-				FrameDesc frame = (FrameDesc) pair.getValue();
 
-				//1. if data in bufpool[current] is not valid, choose current
-				if (!frame.valid) {
-					current = frame;
-					return frame;
-				}
-				//2. if frametab[current]'s pin count is 0
-				else if (frame.pin_count == 0) {
-					// check if frametab [current] has refbit
-					if (frame.refbit) {
-						frame.refbit = false;
-					} else {
-						current = frame;
-						return frame;
-					}
-				}
-				// increment current, mod
-				count++;
-			}
-		}
-		
-		// (-1) if No frame available in the buff. pool
-		// TODO: return an error
-		return null;
-	}
+
+    public FrameDesc pickVictim(BufMgr bm) {
+
+        this.pageFrameArray = new ArrayList<FrameDesc>(bm.pageFrameMap.values());
+
+        //(frametab.length)*2: as we need to check the buff. pool 2 times
+        int i;
+        for (i = 0; i < (pageFrameArray.size() * 2); i++) {
+            current = i % pageFrameArray.size();
+            //1. if data in bufpool[current] is not valid, choose current
+            if (pageFrameArray.get(current).valid != true) {
+                ;
+                return pageFrameArray.get(current);
+            }
+            //2. if frametab[current]'s pin count is 0
+            else {
+                if (pageFrameArray.get(current).pin_count == 0) {
+                    // check if frametab [current] has refbit
+                    if (pageFrameArray.get(current).refbit) {
+                        pageFrameArray.get(current).refbit = false;
+                    } else {
+                        return pageFrameArray.get(current);
+                    }
+                }
+            }
+        }
+
+        // (-1) if No frame available in the buff. pool
+        // TODO: return an error
+        return null;
+    }
 }
+
