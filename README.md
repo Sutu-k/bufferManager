@@ -1,6 +1,3 @@
 # bufferManager
 
-Team members
--------------
-Colleen Toth
-Muna Alfahad
+Team members: Colleen Toth and Muna Alfahad
