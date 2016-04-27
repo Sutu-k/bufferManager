@@ -35,7 +35,7 @@ public class BufMgr implements GlobalConst {
    */
 	
 	ArrayList<FrameDesc> buffer_pool;
-	int MAX;
+	//int MAX;
 	//pageToFrame: to map a disk page number to a frame descriptor 
 	//+ to tell if the a disk page is not in the buffer pool
 	HashMap<PageId, FrameDesc> pageFrameMap;
@@ -43,9 +43,11 @@ public class BufMgr implements GlobalConst {
 	
   public BufMgr(int numframes) {
 
-	  MAX = numframes;
+	  //MAX = numframes;
+	  
 	  buffer_pool = new ArrayList<FrameDesc>();
-	  for (int i = 0; i < MAX; ++i) {
+	  
+	  for (int i = 0; i < numframes; ++i) {
 		  buffer_pool.add(new FrameDesc());
 	  }
 
@@ -86,9 +88,7 @@ public class BufMgr implements GlobalConst {
 
 	//frameNo: to get the frame that holds the page if it is exist in the buffer pool 
 	  FrameDesc frameNo = pageFrameMap.get(pageno);
-	  
-	  //System.out.println("In pinPage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
-	  
+		  
 	// If disk page pageno is already in the buffer pool ==> increment pin_count of that frame.  
 	  if(frameNo != null) {
           frameNo.pin_count++;
@@ -106,16 +106,16 @@ public class BufMgr implements GlobalConst {
 			  if (victimFrm == null) {
 				  throw new IllegalStateException("All pages are pinned (pool is full)!");
 			  } else {
-				  //1. check if frame to use is dirty and update the disk accordingly
+				  //if frame to use is dirty ==> flush page to disk 
 				  if (victimFrm.dirty) {
 					  flushPage(pageno, victimFrm);
 				  }
 			  }
 
-			  //2. remove previous page from the frame if any
+			  //remove previous page from the frame if any
 			  pageFrameMap.remove(pageno);
 
-			  //3. reset the frame details
+			  //reset the frame details
 			  victimFrm.pin_count = 0;
 			  victimFrm.valid = false;
 			  victimFrm.dirty = false;
@@ -170,7 +170,7 @@ public class BufMgr implements GlobalConst {
                   victimFrm.refbit = true;
 
                   pageFrameMap.put(pageno, victimFrm);
-                  victimFrm.setPage(mempage);
+                  //victimFrm.setPage(mempage);
 
                   //set page and data
 //                  mempage.setPage(victimFrm);
@@ -193,12 +193,8 @@ public class BufMgr implements GlobalConst {
    */
   public void unpinPage(PageId pageno, boolean dirty) {
 
-	  //if(pageFrameMap.containsKey(pageno.pid)){
 		  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
 		  FrameDesc frameNo = pageFrameMap.get(pageno);
-		  
-		  //System.out.println("In unpinPage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
-		  
 		  
 		  //first check if the page is not in the buffer pool OR not pinned
 		  if(frameNo == null || frameNo.pin_count == 0)
@@ -224,7 +220,6 @@ public class BufMgr implements GlobalConst {
 			        frameNo.refbit = true;
 			      }
 			}
-	 // }
   } // public void unpinPage(PageId pageno, boolean dirty)
   
   /**
@@ -242,7 +237,7 @@ public class BufMgr implements GlobalConst {
 
 	  //pageno: "Page Id" of 1st allocated page
 	  PageId pageno = new PageId();
-      //pageno.pid = Minibase.DiskManager.allocate_page(run_size).pid;
+
 	  //frameNo: is used to check if firstpg is already pinned
 	  FrameDesc frameNo = pageFrameMap.get(pageno);
 
@@ -255,7 +250,7 @@ public class BufMgr implements GlobalConst {
 	  else if (frameNo != null && frameNo.pin_count > 0) {
 		  throw new IllegalArgumentException("firstpg is already pinned!");
 	  }
-	  //3. otherwise; "pinPage" 
+	  //3. otherwise; "allocate" and "pinPage" 
 	  else {
 		  pageno.pid = Minibase.DiskManager.allocate_page(run_size).pid;
 		  pinPage(pageno, firstpg, PIN_MEMCPY);
@@ -274,14 +269,10 @@ public class BufMgr implements GlobalConst {
    */
   public void freePage(PageId pageno) {
 
-	//if(pageFrameMap.containsKey(pageno.pid)){
 		  
 		//frameNo: is used to check if firstpg is already pinned
 		FrameDesc frameNo = pageFrameMap.get(pageno);
 	    
-		
-		//System.out.println("In freePage: " + "pageno is: # " + pageno.pid + "frameNo is: #" + frameNo);
-		  
 		//1. check if pageno in the buffer pool already
 		// and if it is pinned or not
 		if(frameNo != null && frameNo.pin_count > 0) {
@@ -295,7 +286,6 @@ public class BufMgr implements GlobalConst {
 			Minibase.DiskManager.deallocate_page(pageno);
 			
 		}
-	//}
 
   } // public void freePage(PageId firstid)
 
@@ -326,8 +316,6 @@ public class BufMgr implements GlobalConst {
    */
   public void flushPage(PageId pageno, FrameDesc frameNo) {
 	 
-	  //frameNo: to get the frame that holds the page if it is exist in the buffer pool 
-
 		if(frameNo != null)
 		{
 			if (frameNo.dirty) {
